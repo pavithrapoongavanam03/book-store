@@ -1,36 +1,50 @@
-import express, { request, response } from "express";
-import { PORT, mongoDbURL } from "./config.js";
-import mongoose from "mongoose";
-import booksRouter from "./routers/booksRouter.js";
+import express from 'express';
+import mongoose from 'mongoose';
 import cors from 'cors';
-const app = express();
+import config from './config.js';
+import booksRouter from './routers/booksRouter.js';
 
+const app = express();
+const { port, mongodbUrl } = config;
+
+// Middleware
 app.use(express.json());
 app.use(cors());
-//{
-  //  origin:'http://localhost:3000',
-    //methods:['GET','POST','PUT','DELETE'],
-    //allowedHeaders:['Content-Type'],
-//}));
 
-
-app.get('/',(request,response)=>{
-    console.log(request)
-    return response.status(234).send('welcome to MERN stack');
-
+// Routes
+app.get('/', (req, res) => {
+    res.status(200).send('Welcome to the MERN stack!');
 });
-app.use('/books',booksRouter);
 
-mongoose
-   .connect(mongoDbURL)
-   .then(()=>{
-    console.log('App connected to database');
-    app.listen(PORT,()=>{
-        console.log(`App is listening to port:${PORT}`);
+// Books routes
+app.use('/books', booksRouter);
+
+// Connect to MongoDB
+const connectToMongoDB = async () => {
+    try {
+        await mongoose.connect(mongodbUrl, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
+        console.log('Connected to MongoDB');
+    } catch (error) {
+        console.error('Error connecting to MongoDB:', error.message);
+        process.exit(1); // Exit process with failure
+    }
+};
+
+// Start server after connecting to MongoDB
+const startServer = () => {
+    app.listen(port, () => {
+        console.log(`Server is running on http://localhost:${port}`);
     });
-   
-   })
-   .catch((error)=>{
-    console.log(error);
+};
 
-   });
+// Initialize application
+const init = async () => {
+    await connectToMongoDB();
+    startServer();
+};
+
+// Start the application
+init();

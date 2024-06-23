@@ -1,4 +1,10 @@
-export const PORT=5555;
+import dotenv from 'dotenv';
 
-export const mongoDbURL=
-'mongodb+srv://pavi:pavithra2203@books.xvtz1ts.mongodb.net/?retryWrites=true&w=majority'
+dotenv.config(); // Load environment variables from .env file
+
+const config = {
+    port: process.env.PORT || 5555,
+    mongodbUrl: process.env.MONGODB_URL,
+};
+
+export default config;
